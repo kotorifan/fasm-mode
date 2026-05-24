@@ -520,18 +520,14 @@ With a prefix arg, kill the comment on the current line with
 (define-derived-mode fasm-mode prog-mode "FASM"
   "Major mode for editing FASM assembly programs."
   :group 'fasm-mode
-  (make-local-variable 'indent-line-function)
-  (make-local-variable 'comment-start)
-  (make-local-variable 'comment-insert-comment-function)
-  (make-local-variable 'comment-indent-function)
-  (setq-local tab-width fasm-basic-offset)
-  (setf font-lock-defaults '(fasm-font-lock-keywords nil
- :case-fold)
-        indent-line-function #'fasm-indent-line
-        comment-start ";"
-        comment-indent-function #'fasm-comment-indent
-        comment-insert-comment-function #'fasm-insert-comment
-        imenu-generic-expression fasm-imenu-generic-expression))
+  (setq-local font-lock-defaults '(fasm-font-lock-keywords nil t)
+              tab-width fasm-basic-offset
+              indent-line-function #'fasm-indent-line
+              comment-start ";"
+              comment-indent-function #'fasm-comment-indent
+              comment-insert-comment-function #'fasm-insert-comment
+              imenu-generic-expression fasm-imenu-generic-expression))
+
 
 (provide 'fasm-mode)
 
