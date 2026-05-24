@@ -1,4 +1,4 @@
-;;; fasm-mode.el --- FASM x86 assembly major mode -*- lexical-binding: t; -*-
+;;; fasm-mode.el --- FASM x86 assembly major mode -*-lexical-binding: t; -*-
 
 ;; This is free and unencumbered software released into the public domain.
 
@@ -40,7 +40,7 @@
   "Faces used by `fasm-mode`."
   :group 'fasm-mode)
 
-(defcustom fasm-basic-offset (default-value 'tab-width)
+(defcustom fasm-basic-offset 4
   "Indentation level for `fasm-mode`."
   :type 'integer
   :group 'fasm-mode)
@@ -305,7 +305,7 @@ This can be :tab, :space, or nil (do nothing)."
       "ZERO?" "CARRY?" "SIGN?" "OVERFLOW?" "PARITY?")
     "FASM preprocessor directives (SOURCE/TABLES.INC) for `fasm-mode`."))
 
-(defconst fasm-nonlocal-label-rexexp
+(defconst fasm-nonlocal-label-regexp
   "\\(\\_<[a-zA-Z_?][a-zA-Z0-9_$#@~?]*\\_>\\)\\s-*:"
   "Regexp for `fasm-mode` for matching nonlocal labels.")
 
@@ -481,9 +481,12 @@ With a prefix arg, kill the comment on the current line with
   (if (not (eql arg 1))
       (comment-kill nil)
     (cond
-     ;; Empty line, or inside a string? Insert.
-     ((or (fasm--empty-line-p) (nth 3 (syntax-ppss)))
-      (insert ";"))
+     ;; Empty line, or inside a string? Insert. 
+     ;; Indent if it's on a line within a label
+     ((or (fasm--empty-line-p)
+          (nth 3 (syntax-ppss)))
+      (indent-according-to-mode)
+      (insert ";; "))
      ;; Inside the indentation? Comment out the line.
      ((fasm--inside-indentation-p)
       (insert ";"))
@@ -521,7 +524,9 @@ With a prefix arg, kill the comment on the current line with
   (make-local-variable 'comment-start)
   (make-local-variable 'comment-insert-comment-function)
   (make-local-variable 'comment-indent-function)
-  (setf font-lock-defaults '(fasm-font-lock-keywords nil :case-fold)
+  (setq-local tab-width fasm-basic-offset)
+  (setf font-lock-defaults '(fasm-font-lock-keywords nil
+ :case-fold)
         indent-line-function #'fasm-indent-line
         comment-start ";"
         comment-indent-function #'fasm-comment-indent
